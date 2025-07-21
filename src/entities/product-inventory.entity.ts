@@ -1,40 +1,62 @@
 import { AggregateRoot } from '@nestjs/cqrs';
+import { EventStore } from 'generated/prisma';
+import { JsonValue } from 'generated/prisma/runtime/library';
 import { AddedNewProductEvent } from 'src/events/impl/added-new-product.event';
 import { EventType } from 'src/shared/event.enum';
 
-interface ProductInventoryState {
-  productId: string;
-  productName: string;
-  quantity: number;
-  reserved: number;
-  available: number;
-  version: number;
-}
-
-interface ProductInventoryEvent {
-  aggregateId: string;
-  type: EventType;
-  payload: any;
-  version: number;
-}
-
 export class ProductInventory extends AggregateRoot {
-  constructor(
-    private readonly _productId: string,
-    private readonly _productName: string,
-    private readonly _quantity: number = 0,
-    private readonly _reserved: number = 0,
-    private readonly _available: number = 0,
-    private readonly _version: number = 0,
-  ) {
+  private _productId: string;
+  private _productName: string;
+  private _quantity: number = 0;
+  private _reserved: number = 0;
+  private _available: number = 0;
+  private _version: number = 0;
+  private _lastAppliedEvent: any;
+
+  constructor(productId: string, productName: string, initialQuantity: number = 0) {
     super();
+    const event = new AddedNewProductEvent(productId, productName, initialQuantity, 0, initialQuantity);
+    this.apply(event);
+    this._productId = productId;
+    this._productName = productName;
+    this._quantity = initialQuantity;
+    this._reserved = 0;
+    this._available = initialQuantity;
+    this._version = 1;
+    this._lastAppliedEvent = event;
   }
 
-  public addNewProduct(): void {
-    this.apply(new AddedNewProductEvent(this));
+  private applyAddedNewProductEvent(event: AddedNewProductEvent) {
+    this._productId = event.productId;
+    this._productName = event.productName;
+    this._quantity = event.initialQuantity;
+    this._reserved = 0;
+    this._available = event.initialQuantity;
+    this._lastAppliedEvent = event;
+  }
+
+  // This method is used to create a new ProductInventory instance from an event history.
+  public static replay(events: EventStore[]): ProductInventory {
+    const productInventory = new ProductInventory('', '', 0);
+    for (const event of events) {
+      switch (event.type) {
+        case EventType.AddedNewProductEvent:
+          const payload = event.payload as unknown as AddedNewProductEvent;
+          productInventory.applyAddedNewProductEvent(payload);
+          break;
+
+        default:
+          throw new Error(`Unhandled event type: ${event.type}`);
+      }
+    }
+    return productInventory;
   }
 
   // getters
+  get lastAppliedEvent(): any {
+    return this._lastAppliedEvent;
+  }
+
   get productId(): string {
     return this._productId;
   }

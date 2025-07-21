@@ -1,28 +1,26 @@
 import { EventsHandler, IEventHandler } from "@nestjs/cqrs";
 import { AddedNewProductEvent } from "../impl/added-new-product.event";
-// import { PrismaService } from "src/shared/services/prisma.service";
+import { PrismaService } from "src/shared/services/prisma.service";
+import { Logger } from "@nestjs/common";
 
 @EventsHandler(AddedNewProductEvent)
 export class AddedNewProductEventHandler implements IEventHandler<AddedNewProductEvent> {
-  constructor() {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  public handle(event: AddedNewProductEvent) {
-    console.log(`Handling AddedNewProductEvent for productId: ${event.productInventory.productId}`);
-    // const { productId, productName, initialQuantity } = event;
-
-    // try {
-    //   const result = await this.prismaService.productInventoryProjection.create({
-    //     data: {
-    //       productId,
-    //       productName,
-    //       quantity: initialQuantity,
-    //       reserved: 0,
-    //       available: initialQuantity,
-    //     },
-    //   });
-    //   console.log(`Added new product event handled for productId: ${result.productId}`);
-    // } catch (error) {
-    //   console.error(`Failed to handle AddedNewProductEvent for productId ${productId}:`, error);
-    // }
+  public async handle(event: AddedNewProductEvent) {
+    try {
+      const result = await this.prismaService.productInventoryProjection.create({
+        data: {
+          productId: event.productId,
+          productName: event.productName,
+          quantity: event.initialQuantity,
+          reserved: event.reserved,
+          available: event.available,
+        },
+      });
+      Logger.debug(`AddedNewProductEvent handled successfully for productId: ${result.productId}`);
+    } catch (error) {
+      Logger.error(`Failed to handle AddedNewProductEvent for productId ${event.productId}:`, error);
+    }
   }
 }

@@ -21,15 +21,10 @@ export class NewProductInventoryHandler implements ICommandHandler<NewProductInv
         data: {
           aggregateId: productInventory.productId,
           type: EventType.AddedNewProductEvent,
-          payload: {
-            productId: productInventory.productId,
-            productName: productInventory.productName,
-            initialQuantity: productInventory.quantity,
-          },
+          payload: productInventory.lastAppliedEvent,
           version: productInventory.version,
         },
       });
-      productInventory.addNewProduct();
       productInventory.commit();
       return {
         productId,
