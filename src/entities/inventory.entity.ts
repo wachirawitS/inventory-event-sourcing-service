@@ -39,35 +39,35 @@ export class Inventory extends AggregateRoot {
     return this._lastAppliedEvent;
   }
 
-    get productCode() {
-        return this._productCode;
-    }
+  get productCode() {
+    return this._productCode;
+  }
 
-    get productName() {
-        return this._productName;
-    }
+  get productName() {
+    return this._productName;
+  }
 
-    get productDescription() {
-        return this._productDescription;
-    }
+  get productDescription() {
+    return this._productDescription;
+  }
 
-    get totalQuantity() {
-        return this._totalQuantity;
-    }
+  get totalQuantity() {
+    return this._totalQuantity;
+  }
 
-    get reservedQuantity() {
-        return this._reservedQuantity;
-    }
+  get reservedQuantity() {
+    return this._reservedQuantity;
+  }
 
-    get availableQuantity() {
-        return this._availableQuantity;
-    }
+  get availableQuantity() {
+    return this._availableQuantity;
+  }
 
-    get unitCost() {
-        return this._unitCost;
-    }
+  get unitCost() {
+    return this._unitCost;
+  }
 
-    get version() {
-        return this._version;
-    }
+  get version() {
+    return this._version;
+  }
 }
