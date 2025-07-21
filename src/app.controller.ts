@@ -1,12 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ReceiveGoodDto } from './dto/receive-good.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { ReceiveGoodCommand } from './commands/impl/receive-good.command';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly commandBus: CommandBus) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Post('receive-good')
+  async receiveGood(@Body() receiveGoodDto: ReceiveGoodDto) {
+    return this.commandBus.execute(
+      new ReceiveGoodCommand(
+        receiveGoodDto.productId,
+        receiveGoodDto.quantity,
+        receiveGoodDto.reason,
+      ),
+    );
   }
 }

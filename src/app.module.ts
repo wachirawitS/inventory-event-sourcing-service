@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { CqrsModule } from '@nestjs/cqrs';
+import { SharedModule } from './shared/services/shared.module';
+import { CommandHandlers } from './commands/handlers';
 
 @Module({
-  imports: [],
+  imports: [CqrsModule.forRoot(), SharedModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [...CommandHandlers],
 })
 export class AppModule {}

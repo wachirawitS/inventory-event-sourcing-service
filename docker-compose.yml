@@ -1,0 +1,16 @@
+services:
+  mysqldb:
+    image: mysql:9.3.0
+    container_name: mysqldb_event_sourcing
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: event_sourcing_db
+    volumes:
+      - mysqldb_data:/var/lib/mysql
+    restart: always
+
+volumes:
+  mysqldb_data:
