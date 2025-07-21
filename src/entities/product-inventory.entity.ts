@@ -1,52 +1,60 @@
 import { AggregateRoot } from '@nestjs/cqrs';
+import { AddedNewProductEvent } from 'src/events/impl/added-new-product.event';
+import { EventType } from 'src/shared/event.enum';
 
 interface ProductInventoryState {
   productId: string;
-  productName: string
+  productName: string;
   quantity: number;
   reserved: number;
   available: number;
+  version: number;
 }
 
-interface InventoryEvent {
-  id?: string
-  aggregateId: string
-  type: string
+interface ProductInventoryEvent {
+  aggregateId: string;
+  type: EventType;
   payload: any;
   version: number;
-  createdAt: Date;
 }
 
 export class ProductInventory extends AggregateRoot {
-  private state: ProductInventoryState;
-  private currentVersion: number;
-
-  constructor(private readonly initialVersion: number = 0) {
+  constructor(
+    private readonly _productId: string,
+    private readonly _productName: string,
+    private readonly _quantity: number = 0,
+    private readonly _reserved: number = 0,
+    private readonly _available: number = 0,
+    private readonly _version: number = 0,
+  ) {
     super();
-    this.currentVersion = initialVersion;
   }
 
-   static createNew(productId: string, productName: string, initialQuantity: number = 0): ProductInventory {
-    const aggregate = new ProductInventory(0);
-    
-    // // สร้าง Event เริ่มต้น
-    // const payload: ProductInventoryCreatedEvent = { productId, productName, initialQuantity };
-    // aggregate.applyEvent(
-    //   { type: 'ProductInventoryCreated', payload, version: 1 }, // Event แรกเวอร์ชัน 1
-    //   true // เป็น Event ใหม่
-    // );
-    
-    // // ตั้งค่าสถานะเริ่มต้น (จากการ Apply Event แรก)
-    // // การสร้าง state ตรงนี้หลังจาก applyEvent เพื่อให้ state ถูก initialize ตาม Event แรก
-    // aggregate.state = {
-    //   productId: productId,
-    //   productName: productName,
-    //   quantity: initialQuantity,
-    //   reserved: 0,
-    //   available: initialQuantity,
-    //   version: 1, // หลัง apply Event แรก
-    // };
+  public addNewProduct(): void {
+    this.apply(new AddedNewProductEvent(this));
+  }
 
-    return aggregate;
+  // getters
+  get productId(): string {
+    return this._productId;
+  }
+  get productName(): string {
+    return this._productName;
+  }
+
+  get quantity(): number {
+    return this._quantity;
+  }
+
+  get reserved(): number {
+    return this._reserved;
+  }
+
+  get available(): number {
+    return this._available;
+  }
+
+  get version(): number {
+    return this._version;
   }
 }

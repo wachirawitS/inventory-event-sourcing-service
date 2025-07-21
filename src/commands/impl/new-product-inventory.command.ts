@@ -10,7 +10,7 @@ export class NewProductInventoryCommand extends Command<NewProductInventoryComma
   constructor(
     public readonly productId: string,
     public readonly productName: string,
-    public readonly initialQuantity: number,
+    public readonly initialQuantity?: number,
   ) {
     super();
   }
