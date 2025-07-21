@@ -24,7 +24,7 @@ export class ProductInventory extends AggregateRoot {
     this._reserved = 0;
     this._available = initialQuantity;
     this._version = 1;
-    const event = new AddedNewProductEvent(productId, productName, initialQuantity, 0, initialQuantity);
+    const event = new AddedNewProductEvent(productId, productName, initialQuantity);
     if (isNewEvent) {
       this.apply(event);
     }
@@ -38,9 +38,6 @@ export class ProductInventory extends AggregateRoot {
     const event = new ProductStockAdjustedUpEvent(
       this._productId,
       quantity,
-      this._quantity,
-      this._reserved,
-      this._available,
     );
     if (isNewEvent) {
       this.apply(event);

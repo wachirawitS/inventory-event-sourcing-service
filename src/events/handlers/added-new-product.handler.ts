@@ -14,8 +14,8 @@ export class AddedNewProductEventHandler implements IEventHandler<AddedNewProduc
           productId: event.productId,
           productName: event.productName,
           quantity: event.initialQuantity,
-          reserved: event.reserved,
-          available: event.available,
+          reserved: 0,
+          available: event.initialQuantity,
         },
       });
       Logger.debug(`AddedNewProductEvent handled successfully for productId: ${result.productId}`);

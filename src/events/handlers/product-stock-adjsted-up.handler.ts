@@ -12,9 +12,8 @@ export class ProductStockAdjustedUpEventHandler implements IEventHandler<Product
       const result = await this.prismaService.productInventoryProjection.update({
         where: { productId: event.productId },
         data: {
-          quantity: event.currentQuantity,
-          reserved: event.currentReserved,
-          available: event.currentAvailable,
+          quantity: { increment: event.quantity },
+          available: { increment: event.quantity },
         },
       });
       Logger.debug(`ProductStockAdjustedUpEvent handled successfully for productId: ${result.productId}`);
