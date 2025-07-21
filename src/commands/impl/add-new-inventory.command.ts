@@ -8,7 +8,7 @@ export interface AddNewInventoryCommandResponse extends CommandCommonResponse {
 export interface AddNewInventoryCommandPayload {
   productCode: string;
   productName: string;
-  locationId?: string;
+  locationId: string;
   productDescription?: string;
   initialQuantity: number;
   unitCost: number;

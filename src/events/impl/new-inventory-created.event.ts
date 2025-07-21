@@ -4,7 +4,7 @@ import { CommonEvent } from 'src/shared/interfaces/common-event.impl';
 export interface NewInventoryCreatedPayload {
   productCode: string;
   productName: string;
-  locationId?: string;
+  locationId: string;
   productDescription?: string;
   initialQuantity: number;
   unitCost: number;

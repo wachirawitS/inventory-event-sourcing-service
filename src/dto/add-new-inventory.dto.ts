@@ -12,8 +12,7 @@ export class AddNewInventoryDto {
 
   @ApiProperty()
   @IsString()
-  @IsOptional()
-  locationId?: string;
+  locationId: string;
 
   @ApiProperty()
   @IsString()
