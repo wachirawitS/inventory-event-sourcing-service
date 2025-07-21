@@ -1,5 +1,9 @@
 export enum EventType {
-  AddedNewProductEvent = 'AddedNewProductEvent',
-  ProductStockAdjustedUpEvent = 'ProductStockAdjustedUpEvent',
+  NewInventoryCreatedEvent = 'NewInventoryCreatedEvent',
   InventoryReservedEvent = 'InventoryReservedEvent',
+  InventoryReservationFailedEvent = 'InventoryReservationFailedEvent',
+  InventoryReleasedEvent = 'InventoryReleasedEvent',
+  InventoryDeductedEvent = 'InventoryDeductedEvent',
+  InventoryAddedEvent = 'InventoryAddedEvent',
+  InventoryUnitCostUpdatedEvent = 'InventoryUnitCostUpdatedEvent',
 }
