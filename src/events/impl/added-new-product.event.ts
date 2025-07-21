@@ -1,4 +1,4 @@
-import { ProductInventory } from "src/entities/product-inventory.entity";
+import { EventType } from "src/shared/event.enum";
 
 export class AddedNewProductEvent {
   constructor(
@@ -7,5 +7,6 @@ export class AddedNewProductEvent {
     public readonly initialQuantity: number,
     public readonly reserved: number,
     public readonly available: number,
+    public readonly type: EventType = EventType.AddedNewProductEvent,
   ) {}
 }

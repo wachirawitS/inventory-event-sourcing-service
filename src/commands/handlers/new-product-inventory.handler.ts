@@ -16,14 +16,22 @@ export class NewProductInventoryHandler implements ICommandHandler<NewProductInv
   async execute(command: NewProductInventoryCommand): Promise<NewProductInventoryCommandResponse> {
     const { productId, productName, initialQuantity } = command;
     try {
-      const productInventory = this.publisher.mergeObjectContext(new ProductInventory(productId, productName, initialQuantity));
-      await this.prismaService.eventStore.create({
-        data: {
-          aggregateId: productInventory.productId,
-          type: EventType.AddedNewProductEvent,
-          payload: productInventory.lastAppliedEvent,
-          version: productInventory.version,
-        },
+      const productInventory = this.publisher.mergeObjectContext(
+        new ProductInventory(),
+      );
+      productInventory.addNewProduct(productId, productName, initialQuantity, true);
+      await this.prismaService.$transaction(async (tx) => {
+        if (!productInventory.lastAppliedEvent) {
+          throw new Error('No event was applied to the product inventory.');
+        }
+        await tx.eventStore.create({
+          data: {
+            aggregateId: productInventory.productId,
+            type: productInventory.lastAppliedEvent.type,
+            payload: productInventory.lastAppliedEvent,
+            version: productInventory.version,
+          },
+        });
       });
       productInventory.commit();
       return {
