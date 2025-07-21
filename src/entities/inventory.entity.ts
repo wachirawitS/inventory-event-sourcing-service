@@ -1,6 +1,9 @@
 import { AggregateRoot } from '@nestjs/cqrs';
+import { EventStore } from 'generated/prisma';
 import { AddNewInventoryCommand } from 'src/commands/impl/add-new-inventory.command';
+import { InventoryReservedEvent } from 'src/events/impl/inventory-reserved.event';
 import { NewInventoryCreatedEvent } from 'src/events/impl/new-inventory-created.event';
+import { EventType } from 'src/shared/enums/event.enum';
 import { CommonEvent } from 'src/shared/interfaces/common-event.impl';
 
 export class Inventory extends AggregateRoot {
@@ -13,10 +16,11 @@ export class Inventory extends AggregateRoot {
   private _unitCost: number;
   private _version: number = 0;
   private _lastAppliedEvent: CommonEvent;
+  private _locationId: string;
 
   // method
   public addNewInventory(command: AddNewInventoryCommand, isNewEvent: boolean): void {
-    const { productCode, productName, locationId, productDescription, initialQuantity, unitCost } = command.payload;
+    const { productCode, productName, productDescription, initialQuantity, unitCost, locationId } = command.payload;
     this._productCode = productCode;
     this._productName = productName;
     this._productDescription = productDescription;
@@ -24,6 +28,7 @@ export class Inventory extends AggregateRoot {
     this._reservedQuantity = 0;
     this._availableQuantity = initialQuantity;
     this._unitCost = unitCost;
+    this._locationId = locationId;
     this._version = 1;
 
     const event = new NewInventoryCreatedEvent(command.payload);
@@ -32,6 +37,48 @@ export class Inventory extends AggregateRoot {
     if (isNewEvent) {
       this.apply(event);
     }
+  }
+
+  public reserveInventory(correlationId: string, quantity: number, isNewEvent: boolean) {
+    if (quantity <= 0) {
+      throw new Error('Quantity must be greater than zero');
+    }
+    if (this._availableQuantity < quantity) {
+      throw new Error('Insufficient available inventory');
+    }
+
+    this._reservedQuantity += quantity;
+    this._availableQuantity -= quantity;
+    this._version += 1;
+
+    const event = new InventoryReservedEvent(correlationId, {
+      locationId: this._locationId,
+      productCode: this._productCode,
+      quantity,
+    });
+
+    this._lastAppliedEvent = event;
+
+    if (isNewEvent) {
+      this.apply(event);
+    }
+  }
+
+  // replay method
+  public static replay(events: EventStore[], isNewEvent: boolean = false): Inventory {
+    const inventory = new Inventory();
+    for (const event of events) {
+      switch (event.type) {
+        case EventType.NewInventoryCreatedEvent:
+          const { payload } = event as unknown as NewInventoryCreatedEvent;
+          inventory.addNewInventory(new AddNewInventoryCommand(payload), isNewEvent);
+          break;
+
+        default:
+          throw new Error(`Unhandled event type: ${event.type}`);
+      }
+    }
+    return inventory;
   }
 
   // getters
@@ -69,5 +116,9 @@ export class Inventory extends AggregateRoot {
 
   get version() {
     return this._version;
+  }
+
+  static genAggregateId(productCode: string, locationId: string): string {
+    return `${productCode}-${locationId}`;
   }
 }

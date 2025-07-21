@@ -13,12 +13,13 @@ export class AddNewInventoryHandler implements ICommandHandler<AddNewInventoryCo
 
   public async execute(command: AddNewInventoryCommand): Promise<AddNewInventoryCommandResponse> {
     try {
+      const aggregateId = command.payload.productCode;
       const inventory = this.publisher.mergeObjectContext(new Inventory());
       inventory.addNewInventory(command, true);
       await this.prismaService.$transaction(async (tx) => {
         await tx.eventStore.create({
           data: {
-            aggregateId: command.payload.productCode,
+            aggregateId,
             type: inventory.lastAppliedEvent.type,
             payload: inventory.lastAppliedEvent.payload,
             version: inventory.version,
