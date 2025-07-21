@@ -19,23 +19,25 @@ model EventStore {
   aggregateId String
   type        String
   payload     Json
-  version     Int @default(0)
+  version     Int      @default(0)
   createdAt   DateTime @default(now())
-  createdBy   String @default("system")
+  createdBy   String   @default("system")
 
   @@unique([aggregateId, version])
   @@index([aggregateId])
 }
 
-model ProductInventoryProjection {
-  id          String   @id @default(cuid())
-  productId   String   @unique
-  productName String
-  quantity    Int      @default(0)
-  reserved    Int      @default(0)
-  available   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model ProductStockView {
+  id                 String   @id @default(cuid())
+  productId          String   @unique
+  locationId         String
+  productName        String
+  productDescription String
+  totalQuantity      Int      @default(0)
+  reservedQuantity   Int      @default(0)
+  availableQuantity  Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  @@index([productId])
+  @@index([productId, locationId])
 }
