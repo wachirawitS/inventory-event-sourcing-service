@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { CqrsModule } from '@nestjs/cqrs';
-import { SharedModule } from './shared/services/shared.module';
-import { CommandHandlers } from './commands/handlers';
-import { EventHandlers } from './events/handlers';
+import { SharedModule } from './shared/shared.module';
+import { CommandsModule } from './modules/commands/commands.module';
+import { EventsModule } from './modules/events/events.module';
+import { QueriesModule } from './modules/queries/queries.module';
 
 @Module({
-  imports: [CqrsModule.forRoot(), SharedModule],
-  controllers: [AppController],
-  providers: [...CommandHandlers, ...EventHandlers],
+  imports: [CqrsModule.forRoot(), SharedModule, CommandsModule, EventsModule, QueriesModule],
 })
 export class AppModule {}

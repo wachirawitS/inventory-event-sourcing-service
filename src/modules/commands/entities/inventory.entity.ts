@@ -1,10 +1,10 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 import { EventStore } from 'generated/prisma';
-import { AddNewInventoryCommand } from 'src/commands/impl/add-new-inventory.command';
-import { InventoryReservedEvent } from 'src/events/impl/inventory-reserved.event';
-import { NewInventoryCreatedEvent } from 'src/events/impl/new-inventory-created.event';
 import { EventType } from 'src/shared/enums/event.enum';
 import { CommonEvent } from 'src/shared/interfaces/common-event.impl';
+import { AddNewInventoryCommand } from '../impl/add-new-inventory.command';
+import { NewInventoryCreatedEvent } from 'src/modules/events/impl/new-inventory-created.event';
+import { InventoryReservedEvent } from 'src/modules/events/impl/inventory-reserved.event';
 
 export class Inventory extends AggregateRoot {
   private _productCode: string;
