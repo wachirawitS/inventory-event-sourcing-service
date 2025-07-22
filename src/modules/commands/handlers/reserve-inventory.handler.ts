@@ -12,6 +12,12 @@ export class ReserveInventoryHandler implements ICommandHandler<ReserveCommand> 
   ) {}
 
   public async execute(command: ReserveCommand): Promise<ReserveCommandResponse> {
-    throw new BadRequestException('ReserveInventoryHandler is not implemented yet');
+    const { correlationId, locationId, productCode, quantity } = command.payload;
+    const aggregateId = Inventory.genAggregateId(locationId, productCode);
+    try {
+      
+    } catch (error) {
+      throw new BadRequestException(`Error reserving inventory: ${error.message}`);
+    }
   }
 }
